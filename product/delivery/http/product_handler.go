@@ -29,6 +29,7 @@ func NewProductHandler(e *echo.Echo, us domain.ProductUseCase){
 	}
 	e.GET("/products", handler.FetchProduct)
 	e.POST("/product", handler.Store)
+	e.GET("/product/:id", handler.GetById)
 }
 
 func (p *ProductHandler) FetchProduct(c echo.Context) error {
@@ -59,6 +60,17 @@ func (p *ProductHandler) Store(c echo.Context) (err error) {
 	}
 
 	return c.JSON(http.StatusCreated,  ResponseSuccess {Success: true, Data: product})
+}
+
+func (p *ProductHandler) GetById(c echo.Context)  error{
+	id := c.Param("id")
+	ctx := c.Request().Context()
+	product, err := p.PUsecase.GetById(ctx, id)
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, product)
 }
 
 func isRequestValid(m *domain.Product) (bool, error) {

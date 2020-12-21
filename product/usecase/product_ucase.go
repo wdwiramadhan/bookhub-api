@@ -36,3 +36,13 @@ func (p *ProductUseCase) Store(c context.Context, m *domain.Product) (err error)
 	err = p.productRepo.Store(ctx, m)
 	return
 }
+
+func (p *ProductUseCase) GetById(c context.Context, id string)(res domain.Product,err error){
+	ctx, cancel := context.WithTimeout(c, p.contextTimeout)
+	defer cancel()
+	res, err = p.productRepo.GetById(ctx, id)
+	if err != nil {
+		return
+	}
+	return
+}

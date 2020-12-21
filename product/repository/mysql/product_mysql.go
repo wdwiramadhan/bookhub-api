@@ -71,3 +71,18 @@ func (m *mysqlProductRepository) Store(ctx context.Context, p *domain.Product) (
 	}
 	return
 }
+
+func (m *mysqlProductRepository) GetById(ctx context.Context, id string) (res domain.Product, err error){
+	query := "SELECT * FROM product WHERE id="+id
+	list, err := m.fetch(ctx, query)
+	if err != nil {
+		return
+	}
+
+	if len(list) > 0 {
+		res = list[0]
+	} else {
+		return res, domain.ErrNotFound
+	}
+	return
+}
