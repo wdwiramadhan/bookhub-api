@@ -18,9 +18,11 @@ type Product struct{
 type ProductUseCase interface{
 	Fetch(ctx context.Context) ([]Product, error)
 	Store(context.Context, *Product) error
+	GetById(ctx context.Context, id string) (Product, error)
 }
 
 type ProductRepository interface{
 	Fetch(ctx context.Context) (res []Product, err error)
 	Store(ctx context.Context, a *Product) error
+	GetById(ctx context.Context, id string) (Product, error)
 }
