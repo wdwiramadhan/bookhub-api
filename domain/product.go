@@ -19,10 +19,14 @@ type ProductUseCase interface{
 	Fetch(ctx context.Context) ([]Product, error)
 	Store(context.Context, *Product) error
 	GetById(ctx context.Context, id string) (Product, error)
+	Update(ctx context.Context, ar *Product, id string) error
+	Delete(ctx context.Context, id string) error
 }
 
 type ProductRepository interface{
-	Fetch(ctx context.Context) (res []Product, err error)
+	Fetch(ctx context.Context) ([]Product, error)
 	Store(ctx context.Context, a *Product) error
 	GetById(ctx context.Context, id string) (Product, error)
+	Update(ctx context.Context, ar *Product, id string) error
+	Delete(ctx context.Context, id string) error
 }
