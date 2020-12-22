@@ -86,3 +86,29 @@ func (m *mysqlProductRepository) GetById(ctx context.Context, id string) (res do
 	}
 	return
 }
+
+func (m *mysqlProductRepository) Update(ctx context.Context, p *domain.Product, id string) (err error) {
+	query := `UPDATE product SET name=?, price=?, author=?, description=?, updated_at=? WHERE id=?`
+	stmt, err := m.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return
+	}
+	_,err = stmt.ExecContext(ctx, p.Name, p.Price, p.Author, p.Description, time.Now(), id)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (m *mysqlProductRepository) Delete(ctx context.Context, id string) (err error) {
+	query := `DELETE FROM product WHERE id=?`
+	stmt, err := m.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return
+	}
+	_, err = stmt.ExecContext(ctx, id)
+	if err != nil {
+		return
+	}
+	return
+}

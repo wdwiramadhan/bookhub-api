@@ -46,3 +46,23 @@ func (p *ProductUseCase) GetById(c context.Context, id string)(res domain.Produc
 	}
 	return
 }
+
+func (p *ProductUseCase) Update(c context.Context, m *domain.Product, id string) (err error){
+	ctx, cancel := context.WithTimeout(c, p.contextTimeout)
+	defer cancel()
+	err = p.productRepo.Update(ctx, m, id)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (p *ProductUseCase) Delete(c context.Context, id string) (err error){
+	ctx, cancel := context.WithTimeout(c, p.contextTimeout)
+	defer cancel()
+	err = p.productRepo.Delete(ctx,id)
+	if err != nil {
+		return
+	}
+	return
+}
