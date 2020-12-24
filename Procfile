@@ -1,1 +1,1 @@
-web: bin/bookhub-api
+web: go run main.go
