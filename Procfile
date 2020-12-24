@@ -1,1 +1,0 @@
-echo "web: bookhub-api" > Procfile
