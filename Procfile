@@ -1,1 +1,1 @@
-echo "web: bookhub-api/app" > Procfile
+echo "web: bookhub-api" > Procfile
