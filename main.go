@@ -21,6 +21,10 @@ func main(){
 	if err != nil {
     log.Fatal("Error loading .env file")
 	}
+	serverPort := os.Getenv("PORT")
+	if serverPort == ""{
+		serverPort = "5000"
+	}
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbUser := os.Getenv("DB_USER")
@@ -53,5 +57,5 @@ func main(){
 	timeoutContext := time.Duration(2) * time.Second
 	pu := _productUcase.NewProductUsecase(pr, timeoutContext)
 	_productHttpDelivery.NewProductHandler(e, pu)
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":"+serverPort))
 }
