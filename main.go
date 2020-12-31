@@ -11,6 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 	_ "github.com/go-sql-driver/mysql"
 
+	_articleHttpDeliveryMiddleware "github.com/wdwiramadhan/bookhub-api/product/delivery/http/middleware"
 	_productHttpDelivery "github.com/wdwiramadhan/bookhub-api/product/delivery/http"
 	_productRepo "github.com/wdwiramadhan/bookhub-api/product/repository/mysql"
 	_productUcase "github.com/wdwiramadhan/bookhub-api/product/usecase"
@@ -57,6 +58,8 @@ func main(){
 	}()
 
 	e := echo.New()
+	middL := _articleHttpDeliveryMiddleware.InitMiddleware()
+	e.Use(middL.CORS)
 	pr := _productRepo.NewMysqlProductRepository(dbConn)
 
 	timeoutContext := time.Duration(2) * time.Second
