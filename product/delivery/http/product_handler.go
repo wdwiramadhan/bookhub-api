@@ -27,7 +27,7 @@ func NewProductHandler(e *echo.Echo, us domain.ProductUseCase){
 	handler := &ProductHandler{
 		PUsecase: us,
 	}
-	e.GET("/products", handler.FetchProduct)
+	e.GET("/product", handler.FetchProduct)
 	e.POST("/product", handler.Store)
 	e.GET("/product/:id", handler.GetById)
 	e.PUT("/product/:id", handler.Update)

@@ -11,6 +11,7 @@ type Product struct{
 	Price int64 `json:"price"`
 	Author string `json:"author"`
 	Description string `json:"description"`
+	Image string `json:"image"`
 	UpdatedAt time.Time `json:"updated_at"`
 	CreatedAt time.Time `json:"created_at"`
 }

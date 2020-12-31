@@ -38,6 +38,7 @@ func (m *mysqlProductRepository) fetch(ctx context.Context, query string)  (resu
 			&t.Price,
 			&t.Author,
 			&t.Description,
+			&t.Image,
 			&t.UpdatedAt,
 			&t.CreatedAt,
 		)
@@ -60,12 +61,12 @@ func (m *mysqlProductRepository) Fetch(ctx context.Context) (res []domain.Produc
 }
 
 func (m *mysqlProductRepository) Store(ctx context.Context, p *domain.Product) (err error) {
-	query := `INSERT INTO product VALUES(?,?,?,?,?,?,?)`
+	query := `INSERT INTO product VALUES(?,?,?,?,?,?,?,?)`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
-	_,err = stmt.ExecContext(ctx, p.Id, p.Name, p.Price, p.Author, p.Description, time.Now(), time.Now())
+	_,err = stmt.ExecContext(ctx, p.Id, p.Name, p.Price, p.Author, p.Description, p.Image, time.Now(), time.Now())
 	if err != nil {
 		return
 	}
