@@ -16,8 +16,8 @@ func NewMysqlProductRepository(Conn *sql.DB) domain.ProductRepository {
 	return &mysqlProductRepository{Conn}
 }
 
-func (m *mysqlProductRepository) fetch(ctx context.Context, query string)  (result []domain.Product, err error) {
-	rows, err := m.Conn.QueryContext(ctx, query)
+func (m *mysqlProductRepository) fetch(ctx context.Context, query string, args ...interface{})  (result []domain.Product, err error) {
+	rows, err := m.Conn.QueryContext(ctx, query,args...)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
@@ -74,8 +74,8 @@ func (m *mysqlProductRepository) Store(ctx context.Context, p *domain.Product) (
 }
 
 func (m *mysqlProductRepository) GetById(ctx context.Context, id string) (res domain.Product, err error){
-	query := "SELECT * FROM product WHERE id="+id
-	list, err := m.fetch(ctx, query)
+	query := `SELECT * FROM product WHERE id=?`
+	list, err := m.fetch(ctx, query,id)
 	if err != nil {
 		return
 	}
