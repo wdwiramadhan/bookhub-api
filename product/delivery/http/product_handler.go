@@ -72,7 +72,7 @@ func (p *ProductHandler) GetById(c echo.Context)  error{
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, product)
+	return c.JSON(http.StatusOK,  ResponseSuccess {Success: true, Data: product})
 }
 
 func (p *ProductHandler) Update(c echo.Context) (err error){
