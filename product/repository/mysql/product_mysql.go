@@ -1,23 +1,26 @@
 package mysql
 
 import (
-	"time"
 	"context"
 	"database/sql"
+	"time"
+
 	"github.com/sirupsen/logrus"
 	"github.com/wdwiramadhan/bookhub-api/domain"
 )
 
+// mysqlProductRepository represent the connection database struct
 type mysqlProductRepository struct {
 	Conn *sql.DB
 }
 
+// NewMysqlProductRepository will create an object that represent the product.Repository interface
 func NewMysqlProductRepository(Conn *sql.DB) domain.ProductRepository {
-	return &mysqlProductRepository{Conn}
+	return &mysqlProductRepository{Conn: Conn}
 }
 
-func (m *mysqlProductRepository) fetch(ctx context.Context, query string, args ...interface{})  (result []domain.Product, err error) {
-	rows, err := m.Conn.QueryContext(ctx, query,args...)
+func (m *mysqlProductRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Product, err error) {
+	rows, err := m.Conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
@@ -33,7 +36,7 @@ func (m *mysqlProductRepository) fetch(ctx context.Context, query string, args .
 	for rows.Next() {
 		t := domain.Product{}
 		err = rows.Scan(
-			&t.Id,
+			&t.ID,
 			&t.Name,
 			&t.Price,
 			&t.Author,
@@ -51,7 +54,7 @@ func (m *mysqlProductRepository) fetch(ctx context.Context, query string, args .
 	return result, nil
 }
 
-func (m *mysqlProductRepository) Fetch(ctx context.Context) (res []domain.Product, err error){
+func (m *mysqlProductRepository) Fetch(ctx context.Context) (res []domain.Product, err error) {
 	query := `SELECT * FROM product`
 	res, err = m.fetch(ctx, query)
 	if err != nil {
@@ -66,16 +69,16 @@ func (m *mysqlProductRepository) Store(ctx context.Context, p *domain.Product) (
 	if err != nil {
 		return
 	}
-	_,err = stmt.ExecContext(ctx, p.Id, p.Name, p.Price, p.Author, p.Description, p.Image, time.Now(), time.Now())
+	_, err = stmt.ExecContext(ctx, p.ID, p.Name, p.Price, p.Author, p.Description, p.Image, time.Now(), time.Now())
 	if err != nil {
 		return
 	}
 	return
 }
 
-func (m *mysqlProductRepository) GetById(ctx context.Context, id string) (res domain.Product, err error){
+func (m *mysqlProductRepository) GetByID(ctx context.Context, id string) (res domain.Product, err error) {
 	query := `SELECT * FROM product WHERE id=?`
-	list, err := m.fetch(ctx, query,id)
+	list, err := m.fetch(ctx, query, id)
 	if err != nil {
 		return
 	}
@@ -94,7 +97,7 @@ func (m *mysqlProductRepository) Update(ctx context.Context, p *domain.Product, 
 	if err != nil {
 		return
 	}
-	_,err = stmt.ExecContext(ctx, p.Name, p.Price, p.Author, p.Description, time.Now(), id)
+	_, err = stmt.ExecContext(ctx, p.Name, p.Price, p.Author, p.Description, time.Now(), id)
 	if err != nil {
 		return
 	}

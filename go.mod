@@ -1,6 +1,6 @@
 module github.com/wdwiramadhan/bookhub-api
 
-go 1.14
+go 1.16
 
 require (
 	github.com/go-playground/universal-translator v0.17.0 // indirect
