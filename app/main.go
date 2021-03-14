@@ -1,23 +1,28 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
-	"time"
-	"os"
 	"net/url"
-	"database/sql"
+	"os"
+	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
-	_ "github.com/go-sql-driver/mysql"
 
-	_articleHttpDeliveryMiddleware "github.com/wdwiramadhan/bookhub-api/product/delivery/http/middleware"
 	_productHttpDelivery "github.com/wdwiramadhan/bookhub-api/product/delivery/http"
+	_productHttpDeliveryMiddleware "github.com/wdwiramadhan/bookhub-api/product/delivery/http/middleware"
 	_productRepo "github.com/wdwiramadhan/bookhub-api/product/repository/mysql"
 	_productUcase "github.com/wdwiramadhan/bookhub-api/product/usecase"
+
+	_authorHttDelivery "github.com/wdwiramadhan/bookhub-api/author/delivery/http"
+	_authorRepo "github.com/wdwiramadhan/bookhub-api/author/repository/mysql"
+	_authorUcase "github.com/wdwiramadhan/bookhub-api/author/usecase"
 )
 
-func main(){
+func main() {
 	fmt.Println(os.Getenv("APP_ENV"))
 	if os.Getenv("APP_ENV") != "production" {
 		err := godotenv.Load()
@@ -30,7 +35,6 @@ func main(){
 	if Port == "" {
 		Port = "5000"
 	}
-
 
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
@@ -59,12 +63,15 @@ func main(){
 	}()
 
 	e := echo.New()
-	middL := _articleHttpDeliveryMiddleware.InitMiddleware()
+	middL := _productHttpDeliveryMiddleware.InitMiddleware()
 	e.Use(middL.CORS)
 	pr := _productRepo.NewMysqlProductRepository(dbConn)
+	ar := _authorRepo.NewMysqlAuthorRepository(dbConn)
 
 	timeoutContext := time.Duration(2) * time.Second
 	pu := _productUcase.NewProductUsecase(pr, timeoutContext)
 	_productHttpDelivery.NewProductHandler(e, pu)
-	e.Logger.Fatal(e.Start(":"+Port))
+	au := _authorUcase.NewAuthorUsecase(ar, timeoutContext)
+	_authorHttDelivery.NewAuthorHandler(e, au)
+	e.Logger.Fatal(e.Start(":" + Port))
 }
