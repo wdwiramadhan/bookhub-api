@@ -39,7 +39,7 @@ func (p *ProductUseCase) Store(c context.Context, m *domain.Product) (err error)
 	return
 }
 
-func (p *ProductUseCase) GetByID(c context.Context, id string) (res domain.Product, err error) {
+func (p *ProductUseCase) GetByID(c context.Context, id int) (res domain.Product, err error) {
 	ctx, cancel := context.WithTimeout(c, p.contextTimeout)
 	defer cancel()
 	res, err = p.productRepo.GetByID(ctx, id)
@@ -49,7 +49,7 @@ func (p *ProductUseCase) GetByID(c context.Context, id string) (res domain.Produ
 	return
 }
 
-func (p *ProductUseCase) Update(c context.Context, m *domain.Product, id string) (err error) {
+func (p *ProductUseCase) Update(c context.Context, m *domain.Product, id int) (err error) {
 	ctx, cancel := context.WithTimeout(c, p.contextTimeout)
 	defer cancel()
 	err = p.productRepo.Update(ctx, m, id)
@@ -59,7 +59,7 @@ func (p *ProductUseCase) Update(c context.Context, m *domain.Product, id string)
 	return
 }
 
-func (p *ProductUseCase) Delete(c context.Context, id string) (err error) {
+func (p *ProductUseCase) Delete(c context.Context, id int) (err error) {
 	ctx, cancel := context.WithTimeout(c, p.contextTimeout)
 	defer cancel()
 	err = p.productRepo.Delete(ctx, id)

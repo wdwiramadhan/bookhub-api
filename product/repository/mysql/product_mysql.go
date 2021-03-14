@@ -39,11 +39,16 @@ func (m *mysqlProductRepository) fetch(ctx context.Context, query string, args .
 			&t.ID,
 			&t.Name,
 			&t.Price,
-			&t.Author,
+			&t.AuthorID,
 			&t.Description,
 			&t.Image,
 			&t.UpdatedAt,
 			&t.CreatedAt,
+			&t.Author.ID,
+			&t.Author.Name,
+			&t.Author.DateOfBirth,
+			&t.Author.UpdatedAt,
+			&t.Author.CreatedAt,
 		)
 		if err != nil {
 			logrus.Error(err)
@@ -55,7 +60,7 @@ func (m *mysqlProductRepository) fetch(ctx context.Context, query string, args .
 }
 
 func (m *mysqlProductRepository) Fetch(ctx context.Context) (res []domain.Product, err error) {
-	query := `SELECT * FROM product`
+	query := `SELECT * FROM product JOIN author ON product.author_id = author.id`
 	res, err = m.fetch(ctx, query)
 	if err != nil {
 		return nil, err
@@ -69,15 +74,15 @@ func (m *mysqlProductRepository) Store(ctx context.Context, p *domain.Product) (
 	if err != nil {
 		return
 	}
-	_, err = stmt.ExecContext(ctx, p.ID, p.Name, p.Price, p.Author, p.Description, p.Image, time.Now(), time.Now())
+	_, err = stmt.ExecContext(ctx, p.ID, p.Name, p.Price, p.AuthorID, p.Description, p.Image, time.Now(), time.Now())
 	if err != nil {
 		return
 	}
 	return
 }
 
-func (m *mysqlProductRepository) GetByID(ctx context.Context, id string) (res domain.Product, err error) {
-	query := `SELECT * FROM product WHERE id=?`
+func (m *mysqlProductRepository) GetByID(ctx context.Context, id int) (res domain.Product, err error) {
+	query := `SELECT * FROM product JOIN author ON product.author_id = author.id WHERE product.id=?`
 	list, err := m.fetch(ctx, query, id)
 	if err != nil {
 		return
@@ -91,20 +96,20 @@ func (m *mysqlProductRepository) GetByID(ctx context.Context, id string) (res do
 	return
 }
 
-func (m *mysqlProductRepository) Update(ctx context.Context, p *domain.Product, id string) (err error) {
-	query := `UPDATE product SET name=?, price=?, author=?, description=?, updated_at=? WHERE id=?`
+func (m *mysqlProductRepository) Update(ctx context.Context, p *domain.Product, id int) (err error) {
+	query := `UPDATE product SET name=?, price=?, author_id=?, description=?, updated_at=? WHERE id=?`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
-	_, err = stmt.ExecContext(ctx, p.Name, p.Price, p.Author, p.Description, time.Now(), id)
+	_, err = stmt.ExecContext(ctx, p.Name, p.Price, p.AuthorID, p.Description, time.Now(), id)
 	if err != nil {
 		return
 	}
 	return
 }
 
-func (m *mysqlProductRepository) Delete(ctx context.Context, id string) (err error) {
+func (m *mysqlProductRepository) Delete(ctx context.Context, id int) (err error) {
 	query := `DELETE FROM product WHERE id=?`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {

@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strconv"
 
 	validator "gopkg.in/go-playground/validator.v9"
 
@@ -34,9 +35,9 @@ func NewProductHandler(e *echo.Echo, us domain.ProductUseCase) {
 	}
 	e.GET("/product", handler.FetchProduct)
 	e.POST("/product", handler.Store)
-	e.GET("/product/:id", handler.GetByID)
-	e.PUT("/product/:id", handler.Update)
-	e.DELETE("/product/:id", handler.Delete)
+	e.GET("/product/:productId", handler.GetByID)
+	e.PUT("/product/:productId", handler.Update)
+	e.DELETE("/product/:productId", handler.Delete)
 }
 
 // FetchProduct will fetch the article based on given params
@@ -68,12 +69,12 @@ func (p *ProductHandler) Store(c echo.Context) (err error) {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusCreated, ResponseSuccess{Success: true, Data: product})
+	return c.JSON(http.StatusCreated, ResponseSuccess{Success: true, Data: nil})
 }
 
 // GetByID will get product by given id
 func (p *ProductHandler) GetByID(c echo.Context) error {
-	id := c.Param("id")
+	id, _ := strconv.Atoi(c.Param("productId"))
 	ctx := c.Request().Context()
 	product, err := p.PUsecase.GetByID(ctx, id)
 	if err != nil {
@@ -85,7 +86,7 @@ func (p *ProductHandler) GetByID(c echo.Context) error {
 
 // Update will update the product by given request body and params id
 func (p *ProductHandler) Update(c echo.Context) (err error) {
-	id := c.Param("id")
+	id, _ := strconv.Atoi(c.Param("productId"))
 	var product domain.Product
 	err = c.Bind(&product)
 	if err != nil {
@@ -106,7 +107,7 @@ func (p *ProductHandler) Update(c echo.Context) (err error) {
 
 // Delete will delete product by given param
 func (p *ProductHandler) Delete(c echo.Context) (err error) {
-	id := c.Param("id")
+	id, _ := strconv.Atoi(c.Param("productId"))
 	ctx := c.Request().Context()
 	err = p.PUsecase.Delete(ctx, id)
 	if err != nil {
