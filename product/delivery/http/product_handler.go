@@ -9,19 +9,11 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/wdwiramadhan/bookhub-api/domain"
+	"github.com/wdwiramadhan/bookhub-api/helper/response"
 )
 
-// ResponseError represent the reseponse error struct
-type ResponseError struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
-// ResponseSuccess represent the reseponse success struct
-type ResponseSuccess struct {
-	Success bool        `json:"success"`
-	Data    interface{} `json:"data"`
-}
+var successResponse response.ResponseSuccess = response.ResponseSuccess{Success: true, Data: nil}
+var failedResponse response.ResponseFailed = response.ResponseFailed{Success: false, Message: ""}
 
 // ProductHandler  represent the httphandler for product
 type ProductHandler struct {
@@ -45,9 +37,11 @@ func (p *ProductHandler) FetchProduct(c echo.Context) error {
 	ctx := c.Request().Context()
 	listProduct, err := p.PUsecase.Fetch(ctx)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Success: false, Message: err.Error()})
+		failedResponse.Message = err.Error()
+		return c.JSON(getStatusCode(err), failedResponse)
 	}
-	return c.JSON(http.StatusOK, ResponseSuccess{Success: true, Data: listProduct})
+	successResponse.Data = listProduct
+	return c.JSON(http.StatusOK, successResponse)
 }
 
 // Store will store the article by given request body
@@ -66,10 +60,10 @@ func (p *ProductHandler) Store(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 	err = p.PUsecase.Store(ctx, &product)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		failedResponse.Message = err.Error()
+		return c.JSON(getStatusCode(err), failedResponse)
 	}
-
-	return c.JSON(http.StatusCreated, ResponseSuccess{Success: true, Data: nil})
+	return c.JSON(http.StatusCreated, successResponse)
 }
 
 // GetByID will get product by given id
@@ -78,10 +72,11 @@ func (p *ProductHandler) GetByID(c echo.Context) error {
 	ctx := c.Request().Context()
 	product, err := p.PUsecase.GetByID(ctx, id)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		failedResponse.Message = err.Error()
+		return c.JSON(getStatusCode(err), failedResponse)
 	}
-
-	return c.JSON(http.StatusOK, ResponseSuccess{Success: true, Data: product})
+	successResponse.Data = product
+	return c.JSON(http.StatusOK, successResponse)
 }
 
 // Update will update the product by given request body and params id
@@ -99,10 +94,11 @@ func (p *ProductHandler) Update(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 	err = p.PUsecase.Update(ctx, &product, id)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		failedResponse.Message = err.Error()
+		return c.JSON(getStatusCode(err), failedResponse)
 	}
 
-	return c.JSON(http.StatusOK, ResponseSuccess{Success: true, Data: nil})
+	return c.JSON(http.StatusOK, successResponse)
 }
 
 // Delete will delete product by given param
@@ -111,9 +107,10 @@ func (p *ProductHandler) Delete(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 	err = p.PUsecase.Delete(ctx, id)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		failedResponse.Message = err.Error()
+		return c.JSON(getStatusCode(err), failedResponse)
 	}
-	return c.JSON(http.StatusOK, ResponseSuccess{Success: true, Data: nil})
+	return c.JSON(http.StatusOK, successResponse)
 }
 
 func isRequestValid(m *domain.Product) (bool, error) {

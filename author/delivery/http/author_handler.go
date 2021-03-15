@@ -7,20 +7,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/wdwiramadhan/bookhub-api/domain"
+	"github.com/wdwiramadhan/bookhub-api/helper/response"
 	"gopkg.in/go-playground/validator.v9"
 )
 
-// ResponseError represent the reseponse error struct
-type ResponseError struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
-// ResponseSuccess represent the reseponse success struct
-type ResponseSuccess struct {
-	Success bool        `json:"success"`
-	Data    interface{} `json:"data"`
-}
+var successResponse response.ResponseSuccess = response.ResponseSuccess{Success: true, Data: nil}
+var failedResponse response.ResponseFailed = response.ResponseFailed{Success: false, Message: ""}
 
 // AuthorHandler represent the httphandler for product
 type AuthorHandler struct {
@@ -44,9 +36,11 @@ func (a *AuthorHandler) Fetch(c echo.Context) error {
 	ctx := c.Request().Context()
 	authors, err := a.AUsecase.Fetch(ctx)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Success: false, Message: err.Error()})
+		failedResponse.Message = err.Error()
+		return c.JSON(getStatusCode(err), failedResponse)
 	}
-	return c.JSON(http.StatusOK, ResponseSuccess{Success: true, Data: authors})
+	successResponse.Data = authors
+	return c.JSON(http.StatusOK, successResponse)
 }
 
 func (a *AuthorHandler) Store(c echo.Context) (err error) {
@@ -62,10 +56,11 @@ func (a *AuthorHandler) Store(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 	err = a.AUsecase.Store(ctx, &author)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Success: false, Message: err.Error()})
+		failedResponse.Message = err.Error()
+		return c.JSON(getStatusCode(err), failedResponse)
 	}
 
-	return c.JSON(http.StatusCreated, ResponseSuccess{Success: true, Data: nil})
+	return c.JSON(http.StatusCreated, successResponse)
 }
 
 func (a *AuthorHandler) GetAuthorById(c echo.Context) (err error) {
@@ -73,9 +68,11 @@ func (a *AuthorHandler) GetAuthorById(c echo.Context) (err error) {
 	authorId, _ := strconv.Atoi(c.Param("authorId"))
 	author, err := a.AUsecase.GetAuthorById(ctx, authorId)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Success: false, Message: err.Error()})
+		failedResponse.Message = err.Error()
+		return c.JSON(getStatusCode(err), failedResponse)
 	}
-	return c.JSON(http.StatusOK, ResponseSuccess{Success: true, Data: author})
+	successResponse.Data = author
+	return c.JSON(http.StatusOK, successResponse)
 }
 
 func (a *AuthorHandler) UpdateAuthorById(c echo.Context) (err error) {
@@ -88,9 +85,10 @@ func (a *AuthorHandler) UpdateAuthorById(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 	err = a.AUsecase.UpdateAuthorById(ctx, authorId, &author)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Success: false, Message: err.Error()})
+		failedResponse.Message = err.Error()
+		return c.JSON(getStatusCode(err), failedResponse)
 	}
-	return c.JSON(http.StatusCreated, ResponseSuccess{Success: true, Data: nil})
+	return c.JSON(http.StatusCreated, successResponse)
 }
 
 func (a *AuthorHandler) DeleteAuthorById(c echo.Context) (err error) {
@@ -98,9 +96,10 @@ func (a *AuthorHandler) DeleteAuthorById(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 	err = a.AUsecase.DeleteAuthorById(ctx, authorId)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Success: false, Message: err.Error()})
+		failedResponse.Message = err.Error()
+		return c.JSON(getStatusCode(err), failedResponse)
 	}
-	return c.JSON(http.StatusCreated, ResponseSuccess{Success: true, Data: nil})
+	return c.JSON(http.StatusCreated, successResponse)
 }
 
 func isRequestValid(m *domain.Author) (bool, error) {
